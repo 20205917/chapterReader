@@ -48,21 +48,21 @@ export function renderWebviewHtml(nonce: string): string {
     .topbar {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding: 6px 8px;
+      gap: 4px;
+      padding: 3px 6px;
       border-bottom: 1px solid var(--border);
       background: linear-gradient(180deg, var(--panel), var(--surface));
     }
     .toolbar-main {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       min-width: 0;
     }
     .toolbar-primary {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       min-width: 0;
       flex: 1;
       overflow-x: auto;
@@ -72,8 +72,8 @@ export function renderWebviewHtml(nonce: string): string {
     .toolbar-group {
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px;
+      gap: 3px;
+      padding: 1px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--surface);
@@ -82,21 +82,22 @@ export function renderWebviewHtml(nonce: string): string {
     .topbar button {
       background: var(--btn-bg);
       color: var(--btn-fg);
-      font-size: 12px;
-      padding: 0 10px;
-      height: 26px;
+      font-size: 11px;
+      padding: 0 8px;
+      height: 18px;
+      line-height: 18px;
       border-radius: 999px;
       border-color: transparent;
     }
     #toggleToolbar {
       flex: none;
-      min-width: 52px;
+      min-width: 44px;
       font-weight: 600;
     }
     .toolbar-extra {
       display: none;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       flex-wrap: wrap;
     }
     .topbar.toolbar-expanded .toolbar-extra {
@@ -311,8 +312,7 @@ export function renderWebviewHtml(nonce: string): string {
       <div class="toolbar-main">
         <div class="toolbar-primary">
           <div class="toolbar-group">
-            <button id="importLocal">导入</button>
-            <button id="addOnline">在线添加</button>
+            <button id="toggleCatalog">目录</button>
           </div>
           <div class="toolbar-group">
             <button id="prevChapter">上一章</button>
@@ -326,8 +326,9 @@ export function renderWebviewHtml(nonce: string): string {
       </div>
       <div class="toolbar-extra" id="toolbarExtra">
         <div class="toolbar-group">
+          <button id="importLocal">导入</button>
+          <button id="addOnline">在线添加</button>
           <button id="toggleShelf">书架</button>
-          <button id="toggleCatalog">目录</button>
           <button id="toggleSettings">设置</button>
         </div>
       </div>
