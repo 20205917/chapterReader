@@ -12,6 +12,9 @@ class ReaderViewProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
   private currentBookId?: string;
   private currentChapterId?: string;
+  private readonly progressSaveTimers = new Map<string, NodeJS.Timeout>();
+  private readonly pendingProgress = new Map<string, { chapterId: string; offset: number }>();
+  private readonly progressDebounceMs = 280;
 
   constructor(private readonly reader: ReaderService) {}
 
@@ -88,6 +91,27 @@ class ReaderViewProvider implements vscode.WebviewViewProvider {
     this.post('toggleStealth');
   }
 
+  private queueProgressSave(bookId: string, chapterId: string, offset: number): void {
+    this.pendingProgress.set(bookId, { chapterId, offset });
+    const prevTimer = this.progressSaveTimers.get(bookId);
+    if (prevTimer) {
+      clearTimeout(prevTimer);
+    }
+    const timer = setTimeout(() => {
+      void this.flushProgressSave(bookId);
+    }, this.progressDebounceMs);
+    this.progressSaveTimers.set(bookId, timer);
+  }
+
+  private async flushProgressSave(bookId: string): Promise<void> {
+    const pending = this.pendingProgress.get(bookId);
+    if (!pending) {
+      return;
+    }
+    this.pendingProgress.delete(bookId);
+    this.progressSaveTimers.delete(bookId);
+    await this.reader.setProgress(bookId, pending.chapterId, pending.offset);
+  }
 
   private async jumpChapter(delta: number): Promise<void> {
     if (!this.currentBookId || !this.currentChapterId) {
@@ -130,7 +154,7 @@ class ReaderViewProvider implements vscode.WebviewViewProvider {
         await this.prevChapter();
         break;
       case 'saveProgress':
-        await this.reader.setProgress(msg.bookId, msg.chapterId, msg.offset || 0);
+        this.queueProgressSave(msg.bookId, msg.chapterId, msg.offset || 0);
         break;
       case 'saveSettings':
         await this.reader.setSettings(msg.settings);
@@ -205,13 +229,14 @@ class ReaderViewProvider implements vscode.WebviewViewProvider {
     }
     this.currentBookId = bookId;
     this.currentChapterId = chapterId;
-    await this.reader.setProgress(bookId, chapterId, offset);
     this.post('chapterOpened', {
       bookId,
       chapterId,
       content,
       offset
     });
+    this.queueProgressSave(bookId, chapterId, offset);
+    void this.reader.preloadAdjacentChapters(bookId, chapterId, { ahead: 2, behind: 1 });
   }
 
   private postSnapshot(): void {

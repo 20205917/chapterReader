@@ -6,6 +6,7 @@ import { defaultParsers, SiteParser } from './parsers';
 
 export class OnlineService {
   private readonly parsers: SiteParser[];
+  private readonly inFlightLoads = new Map<string, Promise<string>>();
 
   constructor(private readonly store: Store, private readonly cache: CacheService) {
     this.parsers = defaultParsers();
@@ -66,27 +67,50 @@ export class OnlineService {
   }
 
   async loadChapterContent(bookId: string, chapterId: string): Promise<string> {
-    const cached = await this.cache.get(bookId, chapterId);
-    if (cached) {
-      return cached;
+    const key = `${bookId}:${chapterId}`;
+    const pending = this.inFlightLoads.get(key);
+    if (pending) {
+      return pending;
     }
 
-    const chapter = this.store.listChapters(bookId).find((c) => c.id === chapterId);
-    if (!chapter || !chapter.sourceUrl) {
-      throw new Error('章节不存在或缺少来源链接');
-    }
-
-    const attempts: string[] = [];
-    for (const parser of this.parserOrder(chapter.sourceUrl, chapter.sourceRef)) {
-      try {
-        const content = await parser.parseChapter(chapter.sourceUrl);
-        await this.cache.set(bookId, chapterId, content);
-        return content;
-      } catch (error) {
-        attempts.push(`${parser.siteKey}: ${String(error)}`);
+    const job = (async () => {
+      const cached = await this.cache.get(bookId, chapterId);
+      if (cached) {
+        return cached;
       }
-    }
 
-    throw new Error(`章节解析失败。${attempts.join(' | ')}`);
+      const chapter = this.store.listChapters(bookId).find((c) => c.id === chapterId);
+      if (!chapter || !chapter.sourceUrl) {
+        throw new Error('章节不存在或缺少来源链接');
+      }
+
+      const attempts: string[] = [];
+      for (const parser of this.parserOrder(chapter.sourceUrl, chapter.sourceRef)) {
+        try {
+          const content = await parser.parseChapter(chapter.sourceUrl);
+          await this.cache.set(bookId, chapterId, content);
+          return content;
+        } catch (error) {
+          attempts.push(`${parser.siteKey}: ${String(error)}`);
+        }
+      }
+
+      throw new Error(`章节解析失败。${attempts.join(' | ')}`);
+    })();
+
+    this.inFlightLoads.set(key, job);
+    try {
+      return await job;
+    } finally {
+      this.inFlightLoads.delete(key);
+    }
+  }
+
+  async preloadChapterContent(bookId: string, chapterId: string): Promise<void> {
+    try {
+      await this.loadChapterContent(bookId, chapterId);
+    } catch {
+      // Ignore prefetch failures; foreground reading path will retry on demand.
+    }
   }
 }

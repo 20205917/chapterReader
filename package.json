@@ -2,7 +2,7 @@
   "name": "chapter-reader",
   "displayName": "Chapter Reader",
   "description": "Cursor novel reader extension for online and local TXT/EPUB reading",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "local",
   "engines": {
     "vscode": "^1.85.0"

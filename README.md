@@ -41,7 +41,7 @@ npx @vscode/vsce package
 方式 1（命令行）：
 
 ```bash
-cursor --install-extension chapter-reader-0.0.2.vsix --force
+cursor --install-extension chapter-reader-0.0.3.vsix --force
 ```
 
 方式 2（界面）：

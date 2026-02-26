@@ -47,6 +47,45 @@ export class ReaderService {
     return this.onlineService.loadChapterContent(bookId, chapterId);
   }
 
+  async preloadAdjacentChapters(
+    bookId: string,
+    chapterId: string,
+    options: { ahead?: number; behind?: number } = {}
+  ): Promise<void> {
+    const book = this.store.getBook(bookId);
+    if (!book || book.sourceType !== 'online') {
+      return;
+    }
+    const chapters = this.store.listChapters(bookId);
+    const index = chapters.findIndex((c) => c.id === chapterId);
+    if (index < 0) {
+      return;
+    }
+
+    const ahead = Math.max(0, options.ahead ?? 2);
+    const behind = Math.max(0, options.behind ?? 1);
+    const targets: string[] = [];
+    for (let step = 1; step <= ahead; step += 1) {
+      const next = chapters[index + step];
+      if (next) {
+        targets.push(next.id);
+      }
+    }
+    for (let step = 1; step <= behind; step += 1) {
+      const prev = chapters[index - step];
+      if (prev) {
+        targets.push(prev.id);
+      }
+    }
+    if (targets.length === 0) {
+      return;
+    }
+
+    for (const id of targets) {
+      await this.onlineService.preloadChapterContent(bookId, id);
+    }
+  }
+
   async setProgress(bookId: string, chapterId: string, offset: number): Promise<void> {
     this.store.setProgress({ bookId, chapterId, offset, updatedAt: Date.now() });
     await this.store.save();
