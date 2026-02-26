@@ -1,0 +1,130 @@
+{
+  "name": "chapter-reader",
+  "displayName": "Chapter Reader",
+  "description": "Cursor novel reader extension for online and local TXT/EPUB reading",
+  "version": "0.0.2",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:chapterReader.mainView",
+    "onCommand:chapterReader.open",
+    "onCommand:chapterReader.addOnlineBook",
+    "onCommand:chapterReader.importLocalBook",
+    "onCommand:chapterReader.nextChapter",
+    "onCommand:chapterReader.prevChapter",
+    "onCommand:chapterReader.toggleShelf",
+    "onCommand:chapterReader.toggleCatalog",
+    "onCommand:chapterReader.toggleStealth"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "chapterReader",
+          "title": "Chapter Reader",
+          "icon": "media/book.svg"
+        }
+      ]
+    },
+    "views": {
+      "chapterReader": [
+        {
+          "id": "chapterReader.mainView",
+          "name": "Reader",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "chapterReader.open",
+        "category": "摸鱼阅读",
+        "title": "打开阅读器"
+      },
+      {
+        "command": "chapterReader.addOnlineBook",
+        "category": "摸鱼阅读",
+        "title": "添加在线小说"
+      },
+      {
+        "command": "chapterReader.importLocalBook",
+        "category": "摸鱼阅读",
+        "title": "导入本地小说"
+      },
+      {
+        "command": "chapterReader.nextChapter",
+        "category": "摸鱼阅读",
+        "title": "下一章"
+      },
+      {
+        "command": "chapterReader.prevChapter",
+        "category": "摸鱼阅读",
+        "title": "上一章"
+      },
+      {
+        "command": "chapterReader.toggleShelf",
+        "category": "摸鱼阅读",
+        "title": "切换书架显示"
+      },
+      {
+        "command": "chapterReader.toggleCatalog",
+        "category": "摸鱼阅读",
+        "title": "切换目录显示"
+      },
+      {
+        "command": "chapterReader.toggleStealth",
+        "category": "摸鱼阅读",
+        "title": "切换隐蔽模式"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "chapterReader.nextChapter",
+        "key": "space right",
+        "when": "webviewFocus"
+      },
+      {
+        "command": "chapterReader.prevChapter",
+        "key": "space left",
+        "when": "webviewFocus"
+      },
+      {
+        "command": "chapterReader.toggleShelf",
+        "key": "ctrl+alt+b"
+      },
+      {
+        "command": "chapterReader.toggleCatalog",
+        "key": "ctrl+alt+m"
+      },
+      {
+        "command": "chapterReader.toggleStealth",
+        "key": "ctrl+alt+u"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "axios": "^1.11.0",
+    "cheerio": "^1.1.2",
+    "iconv-lite": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.17.57",
+    "@types/vscode": "^1.85.0",
+    "mocha": "^11.7.2",
+    "typescript": "^5.9.2"
+  }
+}
