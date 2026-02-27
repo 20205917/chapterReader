@@ -9,12 +9,97 @@ export interface SiteParser {
   parseChapter(chapterUrl: string): Promise<string>;
 }
 
+function extractTextWithLineBreaks(node: any): string {
+  const blockTags = new Set([
+    'address',
+    'article',
+    'aside',
+    'blockquote',
+    'dd',
+    'div',
+    'dl',
+    'dt',
+    'figcaption',
+    'figure',
+    'footer',
+    'form',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'header',
+    'li',
+    'main',
+    'nav',
+    'ol',
+    'p',
+    'pre',
+    'section',
+    'table',
+    'tbody',
+    'td',
+    'th',
+    'tr',
+    'ul'
+  ]);
+
+  let output = '';
+  const appendNewline = () => {
+    if (!output.endsWith('\n')) {
+      output += '\n';
+    }
+  };
+
+  const walk = (cur: any) => {
+    if (!cur) {
+      return;
+    }
+    const type = String(cur.type || '').toLowerCase();
+    if (type === 'text' || type === 'cdata') {
+      output += String(cur.data || '');
+      return;
+    }
+    if (type !== 'tag') {
+      return;
+    }
+
+    const tag = String(cur.name || cur.tagName || '').toLowerCase();
+    if (tag === 'script' || tag === 'style' || tag === 'noscript') {
+      return;
+    }
+    if (tag === 'br') {
+      appendNewline();
+      return;
+    }
+
+    const isBlock = blockTags.has(tag);
+    if (isBlock && output && !output.endsWith('\n')) {
+      appendNewline();
+    }
+
+    const children = Array.isArray(cur.children) ? cur.children : [];
+    for (const child of children) {
+      walk(child);
+    }
+
+    if (isBlock) {
+      appendNewline();
+    }
+  };
+
+  walk(node);
+  return output;
+}
+
 function normalizeChapterText(raw: string): string {
   const blockedLine =
     /^(?:textselect\(\);?|(?:read_\d+_\d+\(\);?\s*)+|[a-z_][a-z0-9_]*\(\);?|最新网址|手机用户请浏览|加入书签|返回目录|推荐阅读|广告)$/i;
   const navLine = /(上一章.*章节目录.*下一章|下一章.*章节目录.*上一章)/;
   const breadcrumbLine = /^.{1,40}\s*[>＞]\s*.{1,40}\s*[>＞]\s*.{1,80}$/;
   const menuLine = /^(首页|玄幻小说|修真小说|都市小说|穿越小说|网游小说|科幻小说|其他小说|排行榜单|完本小说|全部小说)$/;
+  const adLine = /(一秒记住.*(?:更新快|无弹窗)|dingdian\d+\.com|请收藏本站|本章未完|点击下一页)/i;
   const lines = raw
     .replace(/textselect\(\);?/gi, '\n')
     .replace(/read_\d+_\d+\(\);?/gi, '\n')
@@ -42,6 +127,9 @@ function normalizeChapterText(raw: string): string {
     }
 
     if (blockedLine.test(line)) {
+      continue;
+    }
+    if (adLine.test(line)) {
       continue;
     }
     if (menuLine.test(line)) {
@@ -140,7 +228,8 @@ function pickBestContentText($: cheerio.CheerioAPI, selectors: string): string {
   const candidates: Array<{ text: string; score: number }> = [];
   const seen = new Set<string>();
   $(selectors).each((_i, el) => {
-    const cleaned = normalizeChapterText($(el).text());
+    const extracted = extractTextWithLineBreaks(el);
+    const cleaned = normalizeChapterText(extracted || $(el).text());
     if (!cleaned || cleaned.length < 40) {
       return;
     }
@@ -174,6 +263,11 @@ function pickBestContentText($: cheerio.CheerioAPI, selectors: string): string {
   candidates.sort((a, b) => b.score - a.score);
   return candidates[0].text;
 }
+
+export const __testOnly = {
+  extractTextWithLineBreaks,
+  normalizeChapterText
+};
 
 class BiqugeLikeParser implements SiteParser {
   constructor(
