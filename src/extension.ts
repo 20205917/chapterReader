@@ -134,6 +134,7 @@ class ReaderViewProvider implements vscode.WebviewViewProvider {
     switch (msg.type) {
       case 'init':
         this.postSnapshot();
+        await this.resumeLastReading();
         break;
       case 'importLocal':
         await this.importLocal();
@@ -167,6 +168,22 @@ class ReaderViewProvider implements vscode.WebviewViewProvider {
       default:
         break;
     }
+  }
+
+  private async resumeLastReading(): Promise<void> {
+    if (this.currentBookId) {
+      return;
+    }
+
+    const snapshot = this.reader.getSnapshot();
+    const progressByBook = new Map(snapshot.progress.map((item) => [item.bookId, item]));
+    const candidateBookId = snapshot.recentBookIds.find((bookId) => progressByBook.has(bookId));
+
+    if (!candidateBookId) {
+      return;
+    }
+
+    await this.openBook(candidateBookId);
   }
 
   private async deleteBook(bookId: string): Promise<void> {
