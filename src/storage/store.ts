@@ -10,19 +10,21 @@ const DEFAULT_SETTINGS: ReaderSettings = {
   stealthMode: false
 };
 
-const DEFAULT_STATE: PersistedState = {
-  books: [],
-  chapters: [],
-  progress: [],
-  cacheEntries: [],
-  failedUrls: [],
-  settings: DEFAULT_SETTINGS,
-  recentBookIds: []
-};
+function createDefaultState(): PersistedState {
+  return {
+    books: [],
+    chapters: [],
+    progress: [],
+    cacheEntries: [],
+    failedUrls: [],
+    settings: { ...DEFAULT_SETTINGS },
+    recentBookIds: []
+  };
+}
 
 export class Store {
   private readonly filePath: string;
-  private state: PersistedState = DEFAULT_STATE;
+  private state: PersistedState = createDefaultState();
 
   constructor(storagePath: string) {
     this.filePath = path.join(storagePath, 'state.json');
@@ -34,12 +36,12 @@ export class Store {
       const raw = await fs.readFile(this.filePath, 'utf8');
       const parsed = JSON.parse(raw) as PersistedState;
       this.state = {
-        ...DEFAULT_STATE,
+        ...createDefaultState(),
         ...parsed,
         settings: { ...DEFAULT_SETTINGS, ...parsed.settings }
       };
     } catch {
-      this.state = DEFAULT_STATE;
+      this.state = createDefaultState();
       await this.save();
     }
   }
