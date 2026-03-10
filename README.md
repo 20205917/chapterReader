@@ -18,44 +18,8 @@
 
 注：以上快捷键仅在 `webview` 聚焦时生效（`when: webviewFocus`）。
 
-## 开发
+## AI 开发流程
 
-```bash
-npm install
-npm run compile
-npm test
-```
+本项目后续由云端 Codex 按统一流程开发、验证、打包与发布。正式流程文档见 [`docs/ai-workflow.md`](docs/ai-workflow.md)，轻量交付记录见 [`docs/ai-worklog.md`](docs/ai-worklog.md)。
 
-在 Cursor/VS Code 中按 `F5` 启动 Extension Host 调试。
-
-## 打包
-
-```bash
-npx @vscode/vsce package
-```
-
-默认会生成 `chapter-reader-<version>.vsix`。
-
-## 安装到 Cursor
-
-方式 1（命令行）：
-
-```bash
-cursor --install-extension chapter-reader-0.0.3.vsix --force
-```
-
-方式 2（界面）：
-
-1. 打开命令面板
-2. 执行 `Extensions: Install from VSIX...`
-3. 选择打包后的 `.vsix`
-
-`--force` 可覆盖已安装旧版本。
-
-## 发布到 GitHub
-
-远程仓库：
-
-```bash
-git@github.com:20205917/chapterReader.git
-```
+如需安装最新构建，请从 GitHub Release 下载对应 `.vsix`，再在 Cursor 中执行 `Extensions: Install from VSIX...`。

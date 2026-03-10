@@ -111,7 +111,9 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "package:vsix": "npx @vscode/vsce package",
+    "release:task": "node ./scripts/release-task.js"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",
