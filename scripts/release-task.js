@@ -7,6 +7,7 @@ const { execFileSync } = require('child_process');
 const rootDir = path.resolve(__dirname, '..');
 const packageJsonPath = path.join(rootDir, 'package.json');
 const worklogPath = path.join(rootDir, 'docs', 'ai-worklog.md');
+const manualQaTemplatePath = path.join(rootDir, 'docs', 'manual-qa-template.md');
 
 function fail(message) {
   console.error(`ERROR: ${message}`);
@@ -224,6 +225,15 @@ function appendWorklogEntry(data) {
   fs.appendFileSync(worklogPath, entry, 'utf8');
 }
 
+function renderManualQaChecklist(data) {
+  const template = fs.readFileSync(manualQaTemplatePath, 'utf8');
+  return template
+    .replaceAll('{{version}}', data.version)
+    .replaceAll('{{tag}}', data.tag)
+    .replaceAll('{{release_url}}', data.releaseUrl)
+    .replaceAll('{{summary}}', data.summary);
+}
+
 function listReleases(slug) {
   const raw = run('gh', ['api', `repos/${slug}/releases?per_page=100`], { capture: true });
   return JSON.parse(raw);
@@ -327,6 +337,15 @@ function main() {
   console.log(`Release complete: ${tag}`);
   console.log(`Asset: ${assetName}`);
   console.log(`URL: ${releaseUrl}`);
+  if (args.manualQa) {
+    console.log('');
+    console.log(renderManualQaChecklist({
+      releaseUrl,
+      summary: args.summary.trim(),
+      tag,
+      version: targetVersion
+    }));
+  }
 }
 
 main();

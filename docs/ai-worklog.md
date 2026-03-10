@@ -26,3 +26,14 @@
 - Commit Hash：待提交
 - 人工验收：否
 - 备注：后续代码任务按 `docs/ai-workflow.md` 执行；本次未执行真实 Release，原因是当前环境缺少 `gh`。
+
+## 2026-03-10 - 固化人工验收模板
+
+- 日期：2026-03-10
+- 任务摘要：新增固定人工验收模板，并让发布脚本在 `--manual-qa yes` 时自动输出同一格式。
+- 版本号：N/A
+- 验证命令结果：`node --check scripts/release-task.js`、模板占位符检查、`npm run compile`、`npm test`
+- Release 链接：N/A
+- Commit Hash：待提交
+- 人工验收：否
+- 备注：本次为流程增强任务，不发版。
