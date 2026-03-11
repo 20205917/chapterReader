@@ -5,6 +5,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 
+const defaultRepoSlug = process.env.CHAPTER_READER_REPO || '20205917/chapterReader';
 const toolStateDir = path.join(os.homedir(), '.chapter-reader-installer');
 
 function fail(message) {
@@ -14,7 +15,7 @@ function fail(message) {
 
 function parseArgs(argv) {
   const result = {
-    repo: '',
+    repo: defaultRepoSlug,
     assetRegex: '^chapter-reader-.*\\.vsix$',
     downloadDir: path.join(toolStateDir, 'downloads'),
     stateFile: path.join(toolStateDir, 'state.json'),
@@ -87,10 +88,11 @@ function normalizeBool(value) {
 function printHelp() {
   console.log(`Usage:
   npm run install:latest
+  node scripts/install-latest-release.js
   npm run install:latest -- --interval-sec 300
 
 Options:
-  --repo                GitHub repo slug (owner/name). Default: infer from git origin
+  --repo                GitHub repo slug (owner/name). Default: ${defaultRepoSlug}
   --asset-regex         Regex for release asset name. Default: ^chapter-reader-.*\\.vsix$
   --download-dir        Directory to store downloaded vsix files
   --state-file          File to track last installed release
@@ -104,6 +106,7 @@ Options:
 Environment:
   GH_TOKEN / GITHUB_TOKEN   Optional GitHub token (recommended for private repos)
   CURSOR_BIN                Optional path to cursor CLI executable
+  CHAPTER_READER_REPO       Default repo slug override
 `);
 }
 
@@ -140,6 +143,17 @@ function inferRepoSlug() {
     fail(`cannot parse GitHub repo slug from origin: ${remote}`);
   }
   return slug;
+}
+
+function resolveRepoSlug(userValue) {
+  if (userValue) {
+    return userValue;
+  }
+  try {
+    return inferRepoSlug();
+  } catch {
+    return defaultRepoSlug;
+  }
 }
 
 function loadState(filePath) {
@@ -280,7 +294,7 @@ function sleep(ms) {
 }
 
 async function runOnce(config) {
-  const repo = config.repo || inferRepoSlug();
+  const repo = resolveRepoSlug(config.repo);
   const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '';
   const release = await getLatestRelease(repo, config.includePrerelease, token);
   const asset = pickVsixAsset(release, config.assetRegex);

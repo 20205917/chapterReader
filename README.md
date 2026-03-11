@@ -18,56 +18,79 @@
 
 注：以上快捷键仅在 `webview` 聚焦时生效（`when: webviewFocus`）。
 
-## 安装与更新（本地 Cursor）
+## 安装与更新（普通用户，无需克隆仓库）
 
-### 方式 A：自动安装最新 Release（推荐）
+### 方式 A：手动安装（最稳妥）
 
-```bash
-npm run install:latest
-```
+1. 打开 GitHub Releases：`https://github.com/20205917/chapterReader/releases`
+2. 下载最新的 `chapter-reader-*.vsix`
+3. 在 Cursor 执行 `Extensions: Install from VSIX...`
 
-说明：
+### 方式 B：自动安装（macOS / Linux）
 
-- 自动识别 `origin` 对应的 GitHub 仓库。
-- 自动拉取最新非预发布 Release。
-- 自动下载 `chapter-reader-*.vsix` 并执行 `cursor --install-extension ... --force`。
-- 默认状态目录：`~/.chapter-reader-installer/`（用于记录已安装版本，避免重复安装）。
-
-### 方式 B：持续轮询自动更新
+前提：本机已安装 `node` 和 `cursor` 命令。
 
 ```bash
-npm run install:latest:watch
+curl -fsSL -o /tmp/install-chapter-reader.js https://raw.githubusercontent.com/20205917/chapterReader/main/scripts/install-latest-release.js
+node /tmp/install-chapter-reader.js
 ```
 
-默认每 300 秒检查一次新版本。适合长期开着本地终端的场景。
+### 方式 C：自动安装（Windows PowerShell）
 
-### 方式 C：手动安装（兜底）
+前提：本机已安装 `node`，且可执行 `cursor` 命令。
 
-1. 从 GitHub Release 下载 `.vsix`。
-2. 在 Cursor 执行 `Extensions: Install from VSIX...`。
+```powershell
+$script = "$env:TEMP\install-chapter-reader.js"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/20205917/chapterReader/main/scripts/install-latest-release.js" -OutFile $script
+node $script
+```
 
-### 常用参数
+### 自动更新（轮询）
+
+macOS / Linux:
+
+```bash
+node /tmp/install-chapter-reader.js --interval-sec 300
+```
+
+Windows PowerShell:
+
+```powershell
+node $env:TEMP\install-chapter-reader.js --interval-sec 300
+```
+
+### 脚本常用参数
+
+`<script-path>` 指已下载脚本路径，例如 `/tmp/install-chapter-reader.js` 或 `$env:TEMP\install-chapter-reader.js`。
 
 ```bash
 # 只查看将安装哪个版本，不执行安装
-npm run install:latest -- --dry-run
+node <script-path> --dry-run
 
 # 强制重装当前最新版本
-npm run install:latest -- --force
+node <script-path> --force
 
 # 指定轮询间隔（秒）
-npm run install:latest -- --interval-sec 120
+node <script-path> --interval-sec 120
 
-# 指定仓库（当 origin 不可用时）
-npm run install:latest -- --repo owner/name
+# 指定仓库（默认 20205917/chapterReader）
+node <script-path> --repo owner/name
 
 # 指定 Cursor CLI 路径（当 cursor 命令不在 PATH 时）
-npm run install:latest -- --cursor-bin /path/to/cursor
+node <script-path> --cursor-bin /path/to/cursor
 ```
 
 私有仓库建议设置：
 
 - `GH_TOKEN` 或 `GITHUB_TOKEN`（避免 API 限流并支持私有 Release）。
+- `CHAPTER_READER_REPO`（覆盖默认仓库地址）。
+
+### 常见问题
+
+- 报错 `no available release found`：
+  当前仓库还没有可用 Release，需先发布至少一个包含 `.vsix` 的版本。
+- 报错 `cannot find Cursor CLI`：
+  先确认 `cursor --help` 可执行，或使用 `--cursor-bin` 指定路径。
 
 ## 开发（本仓库）
 

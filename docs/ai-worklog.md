@@ -59,3 +59,14 @@
 - Commit Hash：待提交
 - 人工验收：否
 - 备注：本次为文档优化任务，不发版。
+
+## 2026-03-11 - README 改为普通用户安装路径
+
+- 日期：2026-03-11
+- 任务摘要：将 README 安装章节改为“无需克隆仓库”的普通用户路径，并补充 macOS/Linux 与 Windows 自动安装命令。
+- 版本号：N/A
+- 验证命令结果：`node --check scripts/install-latest-release.js`、`node scripts/install-latest-release.js --help`、`node scripts/install-latest-release.js --dry-run`（当前无 Release，返回预期错误）、`npm run compile`、`npm test`
+- Release 链接：N/A
+- Commit Hash：待提交
+- 人工验收：否
+- 备注：脚本默认仓库改为 `20205917/chapterReader`，支持脱离 git 仓库运行。
