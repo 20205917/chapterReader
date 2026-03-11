@@ -146,3 +146,25 @@
 - 当前阶段不额外引入 GitHub Actions。
 - 云端 Codex 本地执行的编译、测试、打包与 Release 结果，就是本项目的交付门槛。
 - 本文档是后续 Codex 执行本项目开发流程的正式依据；README 只保留简短入口，不重复完整流程。
+
+## 8. 本地自动安装（跨平台）
+
+- 目标：你本地无需手动下载 `.vsix`，直接自动拉取并安装最新 Release。
+- 脚本：[`scripts/install-latest-release.js`](../scripts/install-latest-release.js)
+- 运行方式：
+  - 一次执行：`npm run install:latest`
+  - 轮询执行：`npm run install:latest:watch`
+- 默认行为：
+  - 自动识别仓库 `origin` 对应的 GitHub 仓库。
+  - 拉取最新非预发布 Release。
+  - 下载匹配 `chapter-reader-*.vsix` 的资产。
+  - 执行 `cursor --install-extension <vsix> --force`。
+  - 记录最近安装状态，避免重复安装同一版本。
+- 常用参数：
+  - `--repo owner/name`：显式指定仓库。
+  - `--interval-sec 300`：按秒轮询。
+  - `--force`：强制重装。
+  - `--dry-run`：仅打印目标版本与资产，不安装。
+  - `--cursor-bin /path/to/cursor`：显式指定 Cursor CLI。
+- 私有仓库建议配置：`GH_TOKEN` 或 `GITHUB_TOKEN`。
+- 首次使用前提：仓库中至少已有一个可用 GitHub Release（含 `.vsix` 资产）。

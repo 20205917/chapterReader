@@ -37,3 +37,14 @@
 - Commit Hash：待提交
 - 人工验收：否
 - 备注：本次为流程增强任务，不发版。
+
+## 2026-03-11 - 新增跨平台自动安装脚本
+
+- 日期：2026-03-11
+- 任务摘要：新增跨平台脚本，自动下载并安装最新 Release 的 `.vsix` 到本地 Cursor，并支持轮询模式。
+- 版本号：N/A
+- 验证命令结果：`node --check scripts/install-latest-release.js`、`node scripts/install-latest-release.js --help`、`npm run install:latest -- --dry-run`（当前无 Release，返回预期错误）、`npm run compile`、`npm test`
+- Release 链接：N/A
+- Commit Hash：待提交
+- 人工验收：否
+- 备注：本次为本地工具链增强，不发版。

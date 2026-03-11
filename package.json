@@ -113,7 +113,9 @@
     "watch": "tsc -watch -p ./",
     "test": "node ./out/test/runTest.js",
     "package:vsix": "npx @vscode/vsce package",
-    "release:task": "node ./scripts/release-task.js"
+    "release:task": "node ./scripts/release-task.js",
+    "install:latest": "node ./scripts/install-latest-release.js",
+    "install:latest:watch": "node ./scripts/install-latest-release.js --interval-sec 300"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",

@@ -23,3 +23,15 @@
 本项目后续由云端 Codex 按统一流程开发、验证、打包与发布。正式流程文档见 [`docs/ai-workflow.md`](docs/ai-workflow.md)，轻量交付记录见 [`docs/ai-worklog.md`](docs/ai-worklog.md)。
 
 如需安装最新构建，请从 GitHub Release 下载对应 `.vsix`，再在 Cursor 中执行 `Extensions: Install from VSIX...`。
+
+推荐直接自动安装：
+
+```bash
+npm run install:latest
+```
+
+如需持续轮询并自动更新：
+
+```bash
+npm run install:latest:watch
+```
