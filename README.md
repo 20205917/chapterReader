@@ -18,20 +18,87 @@
 
 注：以上快捷键仅在 `webview` 聚焦时生效（`when: webviewFocus`）。
 
-## AI 开发流程
+## 安装与更新（本地 Cursor）
 
-本项目后续由云端 Codex 按统一流程开发、验证、打包与发布。正式流程文档见 [`docs/ai-workflow.md`](docs/ai-workflow.md)，轻量交付记录见 [`docs/ai-worklog.md`](docs/ai-worklog.md)。
-
-如需安装最新构建，请从 GitHub Release 下载对应 `.vsix`，再在 Cursor 中执行 `Extensions: Install from VSIX...`。
-
-推荐直接自动安装：
+### 方式 A：自动安装最新 Release（推荐）
 
 ```bash
 npm run install:latest
 ```
 
-如需持续轮询并自动更新：
+说明：
+
+- 自动识别 `origin` 对应的 GitHub 仓库。
+- 自动拉取最新非预发布 Release。
+- 自动下载 `chapter-reader-*.vsix` 并执行 `cursor --install-extension ... --force`。
+- 默认状态目录：`~/.chapter-reader-installer/`（用于记录已安装版本，避免重复安装）。
+
+### 方式 B：持续轮询自动更新
 
 ```bash
 npm run install:latest:watch
 ```
+
+默认每 300 秒检查一次新版本。适合长期开着本地终端的场景。
+
+### 方式 C：手动安装（兜底）
+
+1. 从 GitHub Release 下载 `.vsix`。
+2. 在 Cursor 执行 `Extensions: Install from VSIX...`。
+
+### 常用参数
+
+```bash
+# 只查看将安装哪个版本，不执行安装
+npm run install:latest -- --dry-run
+
+# 强制重装当前最新版本
+npm run install:latest -- --force
+
+# 指定轮询间隔（秒）
+npm run install:latest -- --interval-sec 120
+
+# 指定仓库（当 origin 不可用时）
+npm run install:latest -- --repo owner/name
+
+# 指定 Cursor CLI 路径（当 cursor 命令不在 PATH 时）
+npm run install:latest -- --cursor-bin /path/to/cursor
+```
+
+私有仓库建议设置：
+
+- `GH_TOKEN` 或 `GITHUB_TOKEN`（避免 API 限流并支持私有 Release）。
+
+## 开发（本仓库）
+
+```bash
+npm install
+npm run compile
+npm test
+```
+
+在 Cursor/VS Code 中按 `F5` 启动 Extension Host 调试。
+
+## 发布（云端 Codex）
+
+```bash
+# 常规修复/小改（patch）
+npm run release:task -- --summary "修复章节跳转" --bump patch
+
+# 新增用户可感知能力（minor）
+npm run release:task -- --summary "新增在线书源管理" --bump minor --manual-qa yes
+
+# 首次按本项目流程发版
+npm run release:task -- --summary "首个正式版本" --version 1.0.0
+```
+
+注意：
+
+- 发布前必须确保 `gh` 已安装并登录。
+- 自动安装脚本要求仓库至少已有一个包含 `.vsix` 的 Release。
+
+## 文档索引
+
+- 正式工作流：[`docs/ai-workflow.md`](docs/ai-workflow.md)
+- 工作记录：[`docs/ai-worklog.md`](docs/ai-worklog.md)
+- 人工验收模板：[`docs/manual-qa-template.md`](docs/manual-qa-template.md)
