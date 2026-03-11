@@ -11,6 +11,7 @@ export function renderWebviewHtml(nonce: string): string {
       --bg: var(--vscode-editor-background);
       --panel: var(--vscode-sideBar-background);
       --surface: var(--vscode-editorWidget-background);
+      --surface-2: color-mix(in srgb, var(--surface) 86%, var(--bg) 14%);
       --text: var(--vscode-editor-foreground);
       --muted: var(--vscode-descriptionForeground);
       --border: var(--vscode-panel-border);
@@ -18,25 +19,41 @@ export function renderWebviewHtml(nonce: string): string {
       --active: var(--vscode-list-activeSelectionBackground);
       --btn-bg: var(--vscode-button-secondaryBackground);
       --btn-fg: var(--vscode-button-secondaryForeground);
+      --btn-primary: var(--vscode-button-background);
+      --btn-primary-fg: var(--vscode-button-foreground);
       --danger: var(--vscode-errorForeground);
+      --accent: var(--vscode-textLink-foreground);
     }
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       height: 100vh;
       overflow: hidden;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at 10% -20%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 38%),
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--btn-primary) 10%, transparent), transparent 45%),
+        var(--bg);
       color: var(--text);
-      font-family: var(--vscode-font-family);
+      font-family: 'Avenir Next', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', var(--vscode-font-family);
+      font-size: 13px;
     }
     button {
       font: inherit;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      padding: 7px 10px;
+      color: var(--btn-fg);
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: var(--btn-bg);
+      padding: 7px 12px;
       cursor: pointer;
+      transition: transform 90ms ease, filter 120ms ease, background 120ms ease;
+    }
+    button:hover {
+      filter: brightness(1.06);
+    }
+    button:active {
+      transform: translateY(1px);
     }
     .app {
       position: fixed;
@@ -48,92 +65,74 @@ export function renderWebviewHtml(nonce: string): string {
     .topbar {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      padding: 3px 6px;
+      gap: 8px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--panel), var(--surface));
+      background: linear-gradient(180deg, var(--panel), color-mix(in srgb, var(--panel) 70%, var(--bg) 30%));
+      backdrop-filter: blur(2px);
     }
     .toolbar-main {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       min-width: 0;
     }
     .toolbar-primary {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       min-width: 0;
       flex: 1;
       overflow-x: auto;
-      scrollbar-width: none;
+      scrollbar-width: thin;
     }
-    .toolbar-primary::-webkit-scrollbar { display: none; }
     .toolbar-group {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 3px;
-      padding: 1px;
+      gap: 6px;
+      padding: 4px;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: color-mix(in srgb, var(--surface) 86%, var(--bg) 14%);
       white-space: nowrap;
     }
     .topbar button {
-      background: var(--btn-bg);
-      color: var(--btn-fg);
-      font-size: 11px;
-      padding: 0 8px;
-      height: 18px;
-      line-height: 18px;
+      min-height: 30px;
+      font-size: 12px;
       border-radius: 999px;
-      border-color: transparent;
+      padding: 0 12px;
+      border-color: color-mix(in srgb, var(--border) 50%, transparent);
     }
     #toggleToolbar {
-      flex: none;
-      min-width: 44px;
+      min-width: 54px;
       font-weight: 600;
+      color: var(--btn-primary-fg);
+      background: var(--btn-primary);
     }
     .toolbar-extra {
       display: none;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       flex-wrap: wrap;
+      animation: slide-down 140ms ease;
     }
     .topbar.toolbar-expanded .toolbar-extra {
       display: flex;
     }
-    .toolbar-extra .toolbar-group {
-      background: transparent;
+    @keyframes slide-down {
+      from {
+        transform: translateY(-5px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
     #toggleStealth.active {
-      border-color: var(--vscode-button-background);
-      background: var(--vscode-button-background);
-      color: var(--vscode-button-foreground);
-    }
-    .status-toast {
-      position: fixed;
-      right: 12px;
-      bottom: 12px;
-      max-width: min(60vw, 320px);
-      padding: 6px 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 140ms ease, transform 140ms ease;
-      pointer-events: none;
-      z-index: 30;
-    }
-    .status-toast.show {
-      opacity: 1;
-      transform: translateY(0);
+      border-color: color-mix(in srgb, var(--btn-primary) 68%, transparent);
+      background: color-mix(in srgb, var(--btn-primary) 20%, var(--btn-bg) 80%);
+      color: var(--text);
     }
     .settings-bar {
       display: none;
@@ -142,167 +141,329 @@ export function renderWebviewHtml(nonce: string): string {
       flex-wrap: wrap;
       padding: 8px 12px;
       border-bottom: 1px solid var(--border);
-      background: var(--panel);
+      background: color-mix(in srgb, var(--panel) 72%, var(--bg) 28%);
       font-size: 12px;
     }
-    .settings-bar.show { display: flex; }
+    .settings-bar.show {
+      display: flex;
+      animation: slide-down 120ms ease;
+    }
     .settings-bar label {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       color: var(--muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      border-radius: 8px;
     }
     .settings-bar input {
-      width: 72px;
+      width: 74px;
       font: inherit;
       color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 7px;
       background: var(--surface);
-      padding: 6px 8px;
+      padding: 5px 6px;
+    }
+    .settings-bar button {
+      background: var(--btn-primary);
+      color: var(--btn-primary-fg);
     }
     .main {
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(220px, 30%) minmax(0, 1fr);
+      grid-template-columns: minmax(250px, 30%) minmax(0, 1fr);
       grid-template-rows: minmax(0, 1fr);
-      gap: 10px;
-      padding: 10px;
+      gap: 12px;
+      padding: 12px;
     }
-    .main.shelf-collapsed { grid-template-columns: 1fr; }
-    .main.shelf-collapsed .shelf-panel { display: none; }
+    .main.shelf-collapsed {
+      grid-template-columns: 1fr;
+    }
+    .main.shelf-collapsed .shelf-panel {
+      display: none;
+    }
     .panel {
       border: 1px solid var(--border);
-      background: var(--panel);
-      border-radius: 10px;
+      background: color-mix(in srgb, var(--panel) 88%, var(--bg) 12%);
+      border-radius: 14px;
       min-height: 0;
       height: 100%;
       overflow: hidden;
+      box-shadow: 0 6px 24px color-mix(in srgb, black 12%, transparent);
     }
     .panel-title {
       margin: 0;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border);
-      font-size: 13px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       color: var(--muted);
       background: var(--surface);
     }
     .shelf-list {
-      height: calc(100% - 40px);
+      height: calc(100% - 46px);
       min-height: 0;
       overflow: auto;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
     .book-row {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       gap: 8px;
-      padding: 8px 10px;
-      border-bottom: 1px dashed var(--border);
+      padding: 8px;
+      border: 1px solid color-mix(in srgb, var(--border) 64%, transparent);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--surface) 78%, var(--bg) 22%);
+      transition: background 120ms ease, border-color 120ms ease;
     }
-    .book-row.active { background: var(--active); }
-    .book-main { flex: 1; min-width: 0; cursor: pointer; }
-    .book-main:hover { background: var(--hover); }
+    .book-row.active {
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--border) 50%);
+      background: color-mix(in srgb, var(--active) 72%, var(--surface) 28%);
+    }
+    .book-main {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px;
+    }
+    .book-main:hover {
+      background: var(--hover);
+    }
     .book-title {
       font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .book-meta { font-size: 11px; color: var(--muted); }
-    .delete-btn {
-      font-size: 12px;
-      color: var(--danger);
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: var(--surface);
-    }
-    .reader {
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      min-height: 0;
-      height: 100%;
-    }
-    .reader-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-    /* Keep currentBook DOM for logic compatibility, but hide title bar in reader area. */
-    .reader-head { display: none; }
-    #currentBook {
-      font-size: 15px;
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .chapter-list {
-      max-height: 150px;
-      overflow: auto;
+    .book-meta {
+      margin-top: 3px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .delete-btn {
+      align-self: center;
+      font-size: 11px;
+      color: var(--danger);
+      background: color-mix(in srgb, var(--danger) 10%, var(--surface) 90%);
+      border-color: color-mix(in srgb, var(--danger) 28%, transparent);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+    .reader {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      min-height: 0;
+      height: 100%;
+    }
+    .reader-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 14px 10px;
       border-bottom: 1px solid var(--border);
+      background: var(--surface);
     }
-    .chapter-list.collapsed { display: none; }
-    .chapter-item {
+    #currentBook {
+      font-size: 15px;
+      font-weight: 700;
+      max-width: 70%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #currentChapterMeta {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: right;
+      max-width: 45%;
+    }
+    .chapter-panel {
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 68%, var(--panel) 32%);
+    }
+    .chapter-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       padding: 8px 12px;
-      border-bottom: 1px dashed var(--border);
-      font-size: 13px;
-      cursor: pointer;
+      border-bottom: 1px dashed color-mix(in srgb, var(--border) 68%, transparent);
     }
-    .chapter-item:hover { background: var(--hover); }
-    .article {
+    #chapterSearch {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font: inherit;
+    }
+    #chapterCount {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .chapter-list {
+      max-height: 170px;
+      overflow: auto;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .chapter-list.collapsed {
+      display: none;
+    }
+    .chapter-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+      background: color-mix(in srgb, var(--surface) 76%, var(--bg) 24%);
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease;
+      font-size: 13px;
+    }
+    .chapter-item:hover {
+      background: var(--hover);
+    }
+    .chapter-item.active {
+      border-color: color-mix(in srgb, var(--accent) 48%, var(--border) 52%);
+      background: color-mix(in srgb, var(--active) 72%, var(--surface) 28%);
+    }
+    .chapter-item .chapter-title {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chapter-item .chapter-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .article-wrap {
       min-height: 0;
       overflow: auto;
-      padding: 16px 18px 24px;
-      background: var(--bg);
-      line-height: 1.6;
-      font-size: 16px;
-      white-space: pre-line;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 92%, transparent), var(--bg));
+    }
+    .article {
+      min-height: 100%;
+      padding: 22px 20px 34px;
+      line-height: 1.68;
+      font-size: 18px;
+      white-space: normal;
+      --paragraph-gap: 14px;
+    }
+    .article p {
+      margin: 0 0 var(--paragraph-gap);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .article p:last-child {
+      margin-bottom: 0;
+    }
+    .status-toast {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      max-width: min(62vw, 360px);
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--surface) 88%, var(--bg) 12%);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 140ms ease, transform 140ms ease;
+      pointer-events: none;
+      z-index: 30;
+    }
+    .status-toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
     body.stealth-mode .status-toast {
-      opacity: 0.7;
+      opacity: 0.78;
     }
     body.stealth-mode .shelf-panel {
       display: none;
     }
     body.stealth-mode .main {
       grid-template-columns: 1fr;
-      gap: 0;
-      padding: 6px;
+      padding: 8px;
     }
     body.stealth-mode .reader {
       border-radius: 0;
       border: 0;
-      background: var(--bg);
-      grid-template-rows: 1fr;
+      background: transparent;
+      box-shadow: none;
+      grid-template-rows: minmax(0, 1fr);
     }
-    body.stealth-mode .chapter-list {
+    body.stealth-mode .reader-head,
+    body.stealth-mode .chapter-panel {
       display: none;
     }
+    body.stealth-mode .article-wrap {
+      background: transparent;
+    }
     body.stealth-mode .article {
-      font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
-      letter-spacing: 0.02em;
-      white-space: pre-wrap;
       max-width: 980px;
       margin: 0 auto;
-      padding-top: 10px;
+      padding-top: 12px;
     }
-    @media (max-width: 760px) {
+    @media (max-width: 900px) {
       .main {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(130px, 34%) minmax(0, 1fr);
+        grid-template-rows: minmax(180px, 36%) minmax(0, 1fr);
       }
       .main.shelf-collapsed {
         grid-template-rows: minmax(0, 1fr);
       }
-      .main.shelf-collapsed .reader {
-        grid-row: 1;
+      #currentBook {
+        max-width: 60%;
       }
-      .chapter-list { max-height: 120px; }
+      .chapter-list {
+        max-height: 130px;
+      }
+    }
+    @media (max-width: 620px) {
+      .topbar {
+        padding: 8px 8px 9px;
+      }
+      .main {
+        padding: 8px;
+        gap: 8px;
+      }
+      .article {
+        padding: 16px 14px 26px;
+      }
+      #currentBook {
+        max-width: 100%;
+      }
+      #currentChapterMeta {
+        display: none;
+      }
+      .reader-head {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
@@ -324,7 +485,7 @@ export function renderWebviewHtml(nonce: string): string {
         </div>
         <button id="toggleToolbar" aria-expanded="false">更多</button>
       </div>
-      <div class="toolbar-extra" id="toolbarExtra">
+      <div class="toolbar-extra">
         <div class="toolbar-group">
           <button id="importLocal">导入</button>
           <button id="addOnline">在线添加</button>
@@ -337,6 +498,8 @@ export function renderWebviewHtml(nonce: string): string {
     <div class="settings-bar" id="settingsBar">
       <label>字体 <input id="fontSizeInput" type="number" min="12" max="40" step="1" /></label>
       <label>行高 <input id="lineHeightInput" type="number" min="1.2" max="2.4" step="0.05" /></label>
+      <label>段距 <input id="paragraphSpacingInput" type="number" min="0" max="36" step="1" /></label>
+      <label>宽度 <input id="contentWidthInput" type="number" min="560" max="1200" step="20" /></label>
       <button id="saveReadingSettings">保存阅读设置</button>
     </div>
 
@@ -349,10 +512,20 @@ export function renderWebviewHtml(nonce: string): string {
       <section class="panel reader">
         <div class="reader-head">
           <div id="currentBook">未选择书籍</div>
+          <div id="currentChapterMeta">请选择一本书</div>
         </div>
-        <div class="chapter-list" id="chapterList"></div>
-        <div class="article" id="article">请选择一本书并打开章节。</div>
+        <div class="chapter-panel">
+          <div class="chapter-tools">
+            <input id="chapterSearch" type="search" placeholder="搜索章节标题..." />
+            <span id="chapterCount">0 章</span>
+          </div>
+          <div class="chapter-list" id="chapterList"></div>
+        </div>
+        <div class="article-wrap">
+          <div class="article" id="article">请选择一本书并打开章节。</div>
+        </div>
       </section>
+    </div>
   </div>
 
 <script nonce="${nonce}">
@@ -362,13 +535,16 @@ let state = {
   chapters: [],
   currentBookId: null,
   currentChapterId: null,
+  chapterFilter: '',
   shelfCollapsed: false,
   catalogCollapsed: false,
   settingsOpen: false,
   toolbarExpanded: false,
   settings: {
-    fontSize: 16,
+    fontSize: 18,
     lineHeight: 1.55,
+    paragraphSpacing: 14,
+    contentWidth: 900,
     stealthMode: false
   }
 };
@@ -376,15 +552,20 @@ let state = {
 const statusEl = document.getElementById('status');
 const bookListEl = document.getElementById('bookList');
 const chapterListEl = document.getElementById('chapterList');
+const chapterSearchEl = document.getElementById('chapterSearch');
+const chapterCountEl = document.getElementById('chapterCount');
 const articleEl = document.getElementById('article');
 const currentBookEl = document.getElementById('currentBook');
+const currentChapterMetaEl = document.getElementById('currentChapterMeta');
 const mainRoot = document.getElementById('mainRoot');
 const topbarEl = document.querySelector('.topbar');
-const toolbarExtraEl = document.getElementById('toolbarExtra');
+const toolbarExtraEl = document.querySelector('.toolbar-extra');
 const toggleToolbarBtnEl = document.getElementById('toggleToolbar');
 const settingsBarEl = document.getElementById('settingsBar');
 const fontSizeInputEl = document.getElementById('fontSizeInput');
 const lineHeightInputEl = document.getElementById('lineHeightInput');
+const paragraphSpacingInputEl = document.getElementById('paragraphSpacingInput');
+const contentWidthInputEl = document.getElementById('contentWidthInput');
 const toggleStealthBtnEl = document.getElementById('toggleStealth');
 let statusTimer = null;
 
@@ -487,11 +668,16 @@ function applyPanelState() {
 function syncSettingsInputs() {
   fontSizeInputEl.value = String(state.settings.fontSize);
   lineHeightInputEl.value = String(state.settings.lineHeight);
+  paragraphSpacingInputEl.value = String(state.settings.paragraphSpacing);
+  contentWidthInputEl.value = String(state.settings.contentWidth);
 }
 
 function applyReadingStyle() {
   articleEl.style.fontSize = state.settings.fontSize + 'px';
   articleEl.style.lineHeight = String(state.settings.lineHeight);
+  articleEl.style.setProperty('--paragraph-gap', state.settings.paragraphSpacing + 'px');
+  articleEl.style.maxWidth = state.settings.contentWidth + 'px';
+  articleEl.style.margin = '0 auto';
 }
 
 function renderBooks() {
@@ -510,7 +696,9 @@ function renderBooks() {
 
     const meta = document.createElement('div');
     meta.className = 'book-meta';
-    meta.textContent = state.settings.stealthMode ? ('条目 ' + String(b.chapterCount)) : b.sourceType + ' · ' + b.chapterCount + '章';
+    meta.textContent = state.settings.stealthMode
+      ? ('条目 ' + String(b.chapterCount))
+      : (b.sourceType === 'local' ? '本地导入' : '在线书源') + ' · ' + b.chapterCount + ' 章';
 
     const del = document.createElement('button');
     del.className = 'delete-btn';
@@ -528,15 +716,90 @@ function renderBooks() {
   }
 }
 
+function renderArticleContent(rawText) {
+  const normalized = String(rawText || '').replace(/(\\n\\s*){3,}/g, '\\n\\n').trim();
+  articleEl.innerHTML = '';
+  if (!normalized) {
+    const empty = document.createElement('p');
+    empty.textContent = '当前章节没有可显示的内容。';
+    articleEl.appendChild(empty);
+    return;
+  }
+  let paragraphs = normalized.split(/\\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  if (paragraphs.length <= 1) {
+    const byLine = normalized.split(/\\n+/).map((p) => p.trim()).filter(Boolean);
+    if (byLine.length >= 3) {
+      paragraphs = byLine;
+    }
+  }
+  if (paragraphs.length === 0) {
+    const single = document.createElement('p');
+    single.textContent = normalized;
+    articleEl.appendChild(single);
+    return;
+  }
+  for (const paragraph of paragraphs) {
+    const p = document.createElement('p');
+    p.textContent = paragraph;
+    articleEl.appendChild(p);
+  }
+}
+
+function updateCurrentChapterMeta() {
+  if (!currentChapterMetaEl) return;
+  if (!state.currentBookId) {
+    currentChapterMetaEl.textContent = '请选择一本书';
+    return;
+  }
+  const current = state.chapters.find((c) => c.id === state.currentChapterId);
+  if (!current) {
+    currentChapterMetaEl.textContent = state.chapters.length > 0 ? ('共 ' + state.chapters.length + ' 章') : '无章节';
+    return;
+  }
+  const prefix = '第 ' + String(current.index + 1) + ' 章';
+  currentChapterMetaEl.textContent = state.settings.stealthMode ? prefix : prefix + ' · ' + current.title;
+}
+
 function renderChapters() {
   chapterListEl.innerHTML = '';
-  for (const c of state.chapters) {
+  const keyword = String(state.chapterFilter || '').trim().toLowerCase();
+  const visible = state.chapters.filter((c) => {
+    if (!keyword) {
+      return true;
+    }
+    return c.title.toLowerCase().includes(keyword) || String(c.index + 1).includes(keyword);
+  });
+
+  if (chapterCountEl) {
+    chapterCountEl.textContent = visible.length === state.chapters.length
+      ? (state.chapters.length + ' 章')
+      : (visible.length + '/' + state.chapters.length + ' 章');
+  }
+
+  for (const c of visible) {
     const div = document.createElement('div');
-    div.className = 'chapter-item';
-    div.textContent = state.settings.stealthMode ? ('记录 ' + String(c.index + 1)) : c.title;
+    div.className = 'chapter-item' + (state.currentChapterId === c.id ? ' active' : '');
+    const title = document.createElement('div');
+    title.className = 'chapter-title';
+    title.textContent = state.settings.stealthMode ? ('记录 ' + String(c.index + 1)) : c.title;
+    const meta = document.createElement('div');
+    meta.className = 'chapter-meta';
+    meta.textContent = '序号 ' + String(c.index + 1);
+    div.appendChild(title);
+    div.appendChild(meta);
     div.onclick = () => post('openChapter', { bookId: c.bookId, chapterId: c.id });
     chapterListEl.appendChild(div);
   }
+}
+
+function toggleStealthAndSave() {
+  state.settings.stealthMode = !state.settings.stealthMode;
+  applyStealthMode();
+  renderBooks();
+  renderChapters();
+  updateCurrentChapterMeta();
+  post('saveSettings', { settings: state.settings });
+  setStatus('界面模式已切换');
 }
 
 window.addEventListener('message', (event) => {
@@ -548,6 +811,8 @@ window.addEventListener('message', (event) => {
         ...state.settings,
         fontSize: Number(msg.payload.settings.fontSize ?? state.settings.fontSize),
         lineHeight: Number(msg.payload.settings.lineHeight ?? state.settings.lineHeight),
+        paragraphSpacing: Number(msg.payload.settings.paragraphSpacing ?? state.settings.paragraphSpacing),
+        contentWidth: Number(msg.payload.settings.contentWidth ?? state.settings.contentWidth),
         stealthMode: Boolean(msg.payload.settings.stealthMode ?? state.settings.stealthMode)
       };
       syncSettingsInputs();
@@ -558,8 +823,12 @@ window.addEventListener('message', (event) => {
   }
   if (msg.type === 'bookOpened') {
     state.currentBookId = msg.payload.book.id;
+    state.currentChapterId = msg.payload.progress?.chapterId || null;
     state.chapters = msg.payload.chapters;
-    currentBookEl.textContent = msg.payload.book.title;
+    state.chapterFilter = '';
+    chapterSearchEl.value = '';
+    currentBookEl.textContent = state.settings.stealthMode ? '文档 #' + String(msg.payload.book.id.slice(0, 4)) : msg.payload.book.title;
+    updateCurrentChapterMeta();
     renderBooks();
     renderChapters();
     if (msg.payload.progress) {
@@ -569,9 +838,10 @@ window.addEventListener('message', (event) => {
   if (msg.type === 'chapterOpened') {
     state.currentBookId = msg.payload.bookId;
     state.currentChapterId = msg.payload.chapterId;
-    const normalized = String(msg.payload.content || '').replace(/(\\n\\s*){3,}/g, '\\n\\n');
-    articleEl.textContent = normalized;
+    renderArticleContent(msg.payload.content || '');
     applyReadingStyle();
+    updateCurrentChapterMeta();
+    renderChapters();
     if (typeof msg.payload.offset === 'number') {
       articleEl.scrollTop = msg.payload.offset;
     }
@@ -580,10 +850,16 @@ window.addEventListener('message', (event) => {
     state.currentBookId = null;
     state.currentChapterId = null;
     state.chapters = [];
+    state.chapterFilter = '';
+    chapterSearchEl.value = '';
     currentBookEl.textContent = '未选择书籍';
+    currentChapterMetaEl.textContent = '请选择一本书';
     chapterListEl.innerHTML = '';
-    articleEl.textContent = '请选择一本书并打开章节。';
+    renderArticleContent('请选择一本书并打开章节。');
     renderBooks();
+    if (chapterCountEl) {
+      chapterCountEl.textContent = '0 章';
+    }
   }
   if (msg.type === 'toggleShelf') {
     state.shelfCollapsed = !state.shelfCollapsed;
@@ -594,12 +870,7 @@ window.addEventListener('message', (event) => {
     applyPanelState();
   }
   if (msg.type === 'toggleStealth') {
-    state.settings.stealthMode = !state.settings.stealthMode;
-    applyStealthMode();
-    renderBooks();
-    renderChapters();
-    post('saveSettings', { settings: state.settings });
-    setStatus('界面已更新');
+    toggleStealthAndSave();
   }
   if (msg.type === 'error') {
     setStatus(msg.payload.message);
@@ -627,24 +898,29 @@ document.getElementById('toggleToolbar').onclick = () => {
   state.toolbarExpanded = !state.toolbarExpanded;
   applyToolbarState();
 };
-document.getElementById('toggleStealth').onclick = () => {
-  state.settings.stealthMode = !state.settings.stealthMode;
-  applyStealthMode();
-  renderBooks();
-  renderChapters();
-  post('saveSettings', { settings: state.settings });
-  setStatus('界面已更新');
-};
+document.getElementById('toggleStealth').onclick = () => toggleStealthAndSave();
 document.getElementById('nextChapter').onclick = () => post('nextChapter');
 document.getElementById('prevChapter').onclick = () => post('prevChapter');
+chapterSearchEl.addEventListener('input', () => {
+  state.chapterFilter = chapterSearchEl.value;
+  renderChapters();
+});
 document.getElementById('saveReadingSettings').onclick = () => {
   const nextFont = Number(fontSizeInputEl.value);
   const nextLine = Number(lineHeightInputEl.value);
+  const nextParagraph = Number(paragraphSpacingInputEl.value);
+  const nextWidth = Number(contentWidthInputEl.value);
   if (Number.isFinite(nextFont)) {
     state.settings.fontSize = Math.min(40, Math.max(12, nextFont));
   }
   if (Number.isFinite(nextLine)) {
     state.settings.lineHeight = Math.min(2.4, Math.max(1.2, nextLine));
+  }
+  if (Number.isFinite(nextParagraph)) {
+    state.settings.paragraphSpacing = Math.min(36, Math.max(0, nextParagraph));
+  }
+  if (Number.isFinite(nextWidth)) {
+    state.settings.contentWidth = Math.min(1200, Math.max(560, nextWidth));
   }
   syncSettingsInputs();
   applyReadingStyle();
@@ -662,6 +938,7 @@ syncSettingsInputs();
 applyReadingStyle();
 applyStealthMode();
 applyToolbarState();
+updateCurrentChapterMeta();
 </script>
 </body>
 </html>`;
